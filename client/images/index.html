@@ -1,0 +1,157 @@
+<html>
+<head>
+    <title>Vegans - Babble</title>
+<link rel="stylesheet" type="text/css" href="main.css"/>
+
+<script>
+    var Babble;
+
+    window.onload = function () {
+        document.getElementById('button').onclick = function () {
+            document.getElementById('modal').style.display = "none";
+            register.name.value= 'Anonymous';
+        };
+        document.getElementById('button1').onclick = function () {
+            document.getElementById('modal').style.display = "none";
+        };
+    };
+
+
+    function newmsg(){
+        var NewListItem = document.createElement("li");
+        var alldiv = document.createElement("div");
+        document.getElementById("bottom").style.height = "100px";
+        document.getElementById("to_print").style.height = "100px";
+        //user name
+        var span_name = document.createElement("span");
+        span_name.appendChild(document.createTextNode(register.name.value+' '));
+        span_name.style.fontWeight='bold';
+        span_name.style.fontSize='larger';
+        span_name.style.color='black';
+        span_name.id ="cb";
+                                                        //span_name.addEventListener('click',delmsg,false);
+        //time stamp
+        var span_name_time=document.createElement('span');
+        var now = new Date();
+        span_name_time.appendChild(document.createTextNode(now.getHours()+':'+ ((now.getMinutes()<10?'0':'')+now.getMinutes())));
+        span_name_time.style.fontSize='small';
+
+        //picture
+        var pic = document.createElement("img");
+        if (span_name.innerHTML == "Anonymous "){
+            pic.setAttribute('src', 'ano.png');
+            pic.setAttribute('border', '1px solid');
+        }else{
+            pic.setAttribute('src', 'Lea1.JPG');
+        }
+        pic.setAttribute('class', 'usrpic');
+
+        //content
+        var text_div = document.createElement("div");
+        var content = document.getElementById("to_print").value;
+        //content = content.replace(/\n/g, document.createElement("br"));
+        
+        var textnode=document.createTextNode(content);
+        var pre = document.createElement("pre");
+        pre.appendChild(textnode);
+        document.getElementById("to_print").value='';
+        //document.getElementById("bottom").style.height= 100 px;
+        
+        //x button
+        var xb = document.createElement("span_name");
+        xb.addEventListener('click',delmsg,false);
+        xb.appendChild(document.createTextNode('x'));
+        xb.style.fontWeight='bold';
+        xb.setAttribute('class','cb');
+        xb.setAttribute('id','cb');
+        text_div.appendChild(span_name);
+        text_div.appendChild(span_name_time);
+        text_div.appendChild(document.createElement("br"));
+        text_div.appendChild(textnode);
+
+
+        alldiv.appendChild(pic);
+        alldiv.appendChild(text_div);
+        alldiv.appendChild(xb);
+        NewListItem.appendChild(alldiv);
+        
+        document.getElementById("msglist").appendChild(NewListItem);
+    };    
+
+    function delmsg(){
+        alert('got here');
+        return false;
+    };
+
+    function adjustHeight(el){
+        if ((el.scrollHeight > 100) && (el.scrollHeight<=300)){
+            el.style.height = (el.scrollHeight)+"px";
+        }
+        //if (window.event.keyCode == 13) { newmsg()}
+        document.getElementById("bottom").style.height = el.style.height;
+    }
+
+</script>
+
+</head>
+<body>
+
+    <!-- MODAL -->
+
+
+    <div id="modal">
+        <div class="modalconent">
+            <h2>Who are you?</h2>
+            <form name="register">
+                <div class="field">
+                    Full name: <input type="text" name="name"/>
+                </div>
+                <br>
+                <div class="field">
+                    Email: <input type="text" name="email"/>
+                </div>
+            </form>
+            <div class="options">
+                <button class="anbutton"  id="button"> Stay Anonymous </button>
+                <button class="savebutton"  id="button1"> Save </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- CHAT -->
+
+
+    <div class="header">
+        <div class="title">
+            <img src="logo.png" class="logo">
+        </div>
+        <div class="bodyhead" >
+            <h1>Vegans</h1>
+            <dl>
+                <dt> <img src="bubble2.png"></dt>
+                <dd>0</dd>
+                <dt> <img src="person2.png"></dt>
+                <dd>0</dd>
+            </dl>
+        </div>
+    </div>
+    <div>
+        <nav></nav>
+        <div class="bod">
+            <ol id="msglist">
+                <li><div> <img src="Lea1.JPG" > <div>dgagf<div class="cb" onclick='alert("I can click div")'>x</div></div> </div></li>
+                <li><div> <img src="Lea1.JPG" > <div>cdddd<div class="cb">x</div></div> </div></li>
+            </ol>
+            <a name="pageend"></a>
+        </div>
+        <div class="bottom" id="bottom">
+            <form id="inputform">
+                <textarea placeholder="Type Text Here" id="to_print" onkeypress="adjustHeight(this)"></textarea> <!-- onkeyup="adjustHeight(this)" onkeydown="adjustHeight(this)"  -->
+            <a href="#pageend"><button type="button" class="send" id=" btnsend" aria-label="send" onclick="newmsg()"> <img src="arrow.png"/> </button></a>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

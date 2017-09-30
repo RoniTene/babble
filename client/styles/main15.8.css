@@ -1,0 +1,333 @@
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+html{
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+body{
+    margin: 0;
+    background-color: #f6f6f6;
+    font-family: Nunito;
+    overflow: hidden;
+}
+
+.modal {
+    position: fixed;
+    font-family: Nunito;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99999;
+    margin-top: 0; /*110px;*/
+    height: 100%;/*calc(100% - 110px);*/
+    width: 100%;
+}
+
+.modal-content { 
+    position: absolute;
+    top: 50%;/*40%;*/
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #f9f9f9;
+    width: 80%;/*350px;*/
+    height: 80%;/* height: 25%;*/
+    padding: 20px;
+    border-radius: 2px;
+}
+
+h2{
+    margin-bottom: 10px;
+    margin-top: 0px;
+    font-weight: normal;
+    padding: 5px;
+}
+
+.field{
+  padding-left: 5px;
+  color: gray;
+}
+
+.field > input{
+    float: none;/*right;*/
+    display: block; /**/
+    border-radius: 8px;
+    border: 1px lightgray solid;
+    font-family: Nunito;
+    width: 70%;
+    height: 25px;
+    font-weight: bold;
+    padding: 3 5 3 5;
+    box-sizing: border-box;
+}
+
+.buttons{
+    position: absolute; /**/
+    bottom: 10px; /**/
+    right: 5px; /**/
+    display: block;
+    float: right;
+    padding: 10px;
+    box-sizing: border-box; /* Make sure that padding and width stays in place */
+}
+
+.saveButton{
+    background-image: linear-gradient( #7ad74c , #43a16d );
+    border: none;
+    margin-left: 6px;
+    border-radius: 2px;
+    padding: 2px 20px;
+    font-family: Nunito;
+    color: white;
+}
+.annButton{ /*anonymous button*/
+    background-image: linear-gradient( #d0d0d0 , #b3b3b3 );
+    border: none;
+    border-radius: 2px;
+    padding: 2px 6px;
+    font-family: Nunito;
+}
+
+nav{
+    /*height: 100%;
+    width: 17%;
+    background-color:#61d290;
+    position: fixed;
+    z-index: -1;*/
+    visibility: hidden;
+}
+
+.logo{
+    background-color: #353744;
+    height: 110px; 
+    width: 100%; /*??*/
+}
+
+h1{
+    position: relative;
+    font-family: Nunito;
+    display: inline-block;
+    vertical-align: bottom;
+    margin-left: 0%; /*18%;*/
+    padding-left: 15px;
+    text-align: left;
+}
+
+dl {
+    position: fixed;
+    display: inline-flex;
+    padding: 1em;
+    right: 30px;
+}
+
+dt {
+    text-align: right;
+    margin-left: 0.3em;
+}
+
+dd {
+    margin: 2px;
+}
+
+.name, .stat{
+    padding-bottom: 5px;
+    margin: 0px;
+    padding-right: 5px;
+    font-size: 15px;
+    font-weight: bold;
+    display: inline-block;
+    vertical-align: top;
+    font-style: normal;
+    }
+
+.AllMessages{ /*ol div*/
+    position: absolute;
+    overflow-y: auto;
+    margin-left: 0%;/*17%;*/
+    height: calc(100% - 300px); 
+    display: block;
+    list-style: none;
+    width: 100%;/*83%;*/
+}
+
+ol{
+    padding-left: 5px;
+    margin: 0;
+}
+
+li{ /*message*/
+    display: block;
+    
+}
+
+.logos{
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: top;
+    margin: 5px;
+    border: 1px solid #d7d7d7;
+}
+
+.boxmessage{
+    background-color: white;
+    border: 1px solid #d7d7d7;
+    padding: 5px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    max-width: calc(100% - 100px);
+    border-radius: 8px;
+    display: inline-block;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.boxmessage:hover, :focus{
+    background-color: #ebedec;
+    outline: 0;
+}
+
+.hour{
+    /*padding-top: 3px;*/
+    font-size: 12px;
+    /*margin: 0px;*/
+    color: #b4b4b4;
+    /*display: inline; /*or inline-block*/
+    margin-right: 10px;
+}
+
+.boxmessage .delete{
+    visibility: hidden;
+    position: absolute;
+    right: 3px;
+    top: 2px;
+    padding-right: 3px;
+    border: none;
+}
+
+.boxmessage:hover .delete, .boxmessage:focus .delete{
+    visibility: visible;
+    cursor: pointer;
+    font-weight: bold;
+    background: none;
+}
+
+.delete:focus {
+    outline: 0;
+}
+
+.newMsgTxt{
+   /* padding: 0px;*/
+    margin: 0px;
+    color:#616161;
+   /*width: auto;
+    max-width: 600px; /*maximum length of a row*/
+}
+
+.footer {
+    position: fixed; /* Set the navbar to fixed position */
+    margin-left: 0%;/*17%;*/
+    background-color: white;
+    bottom: 0; /* Position the navbar at the top of the page */
+    border: 1px solid #d7d7d7;
+    /*float: right;
+    right: -2px;*/
+    height: 90px;
+    width: 100%; /*83%*/
+}
+
+textarea {
+    box-sizing: border-box;
+    border: none;
+    resize: none;
+    padding-left: 1%;
+    width: calc(100% - 108px);/*calc(83% - 108px);*/
+    height: 90px;
+    outline: none;
+    max-height: 300px; /*Not doing anything*/
+}
+
+.send{
+    position: fixed;
+    right: -14px;
+    bottom: 8px;
+    border: none;
+    background-color: white;
+}
+
+/* Mobile Design */
+@media only screen and (min-width: 638px) {
+
+    .modal {
+        margin-top: 110px;
+        height: calc(100% - 110px);
+    }
+
+    .modal-content { 
+        height: 164px;
+        width: 350px;
+        top: 40%;
+    }
+
+    h1{
+        margin-left: 18%;
+    }
+
+    .field > input{
+        float: right;
+    }
+
+    nav {
+        height: 100%;
+        width: 17%;
+        background-color: #61d290;
+        position: fixed;
+        z-index: -1;
+        visibility: visible;
+    }
+
+    .AllMessages{
+        margin-left: 17%;
+        width: 83%;
+    }
+
+    .boxmessage{
+    max-width: 600px;
+    }
+
+    .newMsgTxt{
+        max-width: 600px;
+    }
+
+    .footer{
+        margin-left: 17%;
+    }
+
+    textarea{
+        width: calc(83% - 108px);
+    }
+}
+ 
+/* Scroll bar design */
+::-webkit-scrollbar-track
+{
+	border-radius: 10px;
+	background-color: white;
+    border: 1px solid #DCDCDC;
+}
+
+::-webkit-scrollbar
+{
+	width: 9px;
+    border-radius: 10px;
+	background-color: white;
+    border: 1px solid #DCDCDC;
+}
+
+::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	background-color: #EBEDEC;
+    border: 1px solid #D7D7D7;
+}
