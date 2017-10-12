@@ -1,17 +1,21 @@
 ///// User java script /////
 //'use strict';
+//var a = new INFO('', '');
+//localStorage.setItem('babble', JSON.stringify(a));
+
 window.Babble = {
 	id: 42,
 	messagesArr : new Array(),
 	usersArr : new Array(),
-	numOfUsers : 0,
+	userCount : 0,
 	
 	/*** BABBLE FUNCTIONS ***/
 	register : function (userInformation)
 	{
 		if (typeof(Storage) !== "undefined")
         {
-		    localStorage.setItem('babble', JSON.stringify(userInformation));
+            var newLocal = new INFO(userInformation.name, userInformation.email);
+		    localStorage.setItem('babble', JSON.stringify(newLocal));
 		}
         else
         {
@@ -20,51 +24,43 @@ window.Babble = {
 	
         var req = {
             method : "GET",
-            action: "http://localhost:9000/register?usermail="+userInformation.userInfo.email
+            action: "http://localhost:9000/register?usermail="+userInformation.email
         };
 
-		httpReqASync(req);
+        httpReqASync(req);
 	},
 
     
 	getMessages : function (count, callback)
 	{
-		var response = httpReqSync("GET", "http://localhost:9000/messages?counter="+count);
-		if (response !="")
-		{
-			callback(JSON.parse(response));
-		}
+        NewhttpReqASync('GET', "http://localhost:9000/messages?counter="+count, callback);
 	},
 	
 	postMessage: function (message, callback)
 	{
-		var response = httpReqSync("POST", "http://localhost:9000/messages", message);
-		if (response !="")
-		{
-			callback( {msgId: String(Babble.id)} ); /*another callback option!!!!!*/
-		}
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost:9000/messages", true);
+        xhr.onload = function (){
+            if (xhr.status == 200)
+            {
+                callback( {id: String(Babble.id)} );
+            }
+        };
+        xhr.send(JSON.stringify(message));
 	},
 	
 	deleteMessage : function (id, callback)
 	{
-		var response = httpReqSync("DELETE", "http://localhost:9000/messages/"+id);
-		if (response !="")
-		{
-			callback(JSON.parse(response));
-		}
+        NewhttpReqASync("DELETE", "http://localhost:9000/messages/"+id, callback);
 	},
 	
 	getStats : function (callback)
 	{
-		var response = httpReqSync("GET", "http://localhost:9000/stats");
-		if (response != "")
-		{
-			callback(JSON.parse(response));
-		}
+        NewhttpReqASync("GET", "http://localhost:9000/stats", callback);
 	}
 };
 
-function httpReqSync(method, url, data)
+/*function httpReqSync(method, url, data)
 {
     var xhr = new XMLHttpRequest();
     xhr.open(method, url, false); // false for synchronous request
@@ -76,41 +72,36 @@ function httpReqSync(method, url, data)
         xhr.send();
 
     return xhr.responseText;
-}
+}*/
 
 function httpReqASync(req) {
     return new Promise(function(resolve, reject) {
         var xhr = new XMLHttpRequest();
         xhr.open(req.method, req.action); 
-        xhr.timeout = 500; //every half minute
-        /*if (req.method === 'post' ) //nothing with post
-        {
-            xhr.setRequestHeader('Content-Type', 'application/json');
-        }*/
+        xhr.timeout = 200;
         xhr.addEventListener('load', function(e) {
             resolve(e.target.responseText);
         });
 
-        //xhr.send(JSON.stringify(req.data));
         xhr.send();
     });
 }
 
+function NewhttpReqASync(method, url, callback) {
+var xhr = new XMLHttpRequest();
+        xhr.open(method, url, true);
+        xhr.onload = function (){
+            if (xhr.status == 200 || xhr.status == 204)
+            {
+                callback(JSON.parse(xhr.responseText));
+            }
+        };
+        xhr.send();
+}
 
-// check for updates every second
-function poll(action) {
-    
-    var user, result;
-    var userCount = parseInt(document.getElementById('cntUsers').innerHTML);
-    var numOfMsg = parseInt(document.getElementById('cntMsg').innerHTML);
-    var Babble = window.Babble; 
-    var counter = document.getElementById('ol_AllMessages').childElementCount; // number of messages on ol
-
-    if (action === undefined) // remove 'undefined' from sending data
-    {
-        action = '';
-    }
-                
+var poll = function(){
+    var Babble = window.Babble;
+    var user;
     if (typeof(Storage) !== "undefined")
     {
         user = JSON.parse(localStorage.getItem('babble'));
@@ -120,44 +111,65 @@ function poll(action) {
         console.log('Not supported');
     }
 
-    if(!user)
-    {     
-        return;
-    }
-
-    Babble.getMessages(numOfMsg , function(result){ 
-        if(result !== "") //there is more/less messages to display
+    Babble.getStats(function(resulti){
+        if(resulti !== undefined )
         {
-            updateBrowser(result); //update the browser with the new messages
-        }
-    });
-                        
-    Babble.getStats(function(result){
-        if(result !== undefined )
-        {
-             document.getElementById('cntUsers').innerHTML = result.users;
-             document.getElementById('cntMsg').innerHTML = result.messages;
+            document.getElementById('cntUsers').innerHTML = resulti.users;
+            document.getElementById('cntMsg').innerHTML = resulti.messages;
         }
     });
 
-    var req = {
-        method: "GET",
-        action: "http://localhost:9000/register?usermail="+user.userInfo.email
+    var numOfMsg = parseInt(document.getElementById('cntMsg').innerHTML);
+
+    Babble.getMessages(numOfMsg, function(result){
+        if (result != "") //getMessages return the messages array
+        {
+            numOfMsg = result.length;
+            updateBrowser(result);
+            poll();
+            //setInterval(poll, 30000); //every 30 second send a new request.
+        }
+    });
+
+    if (user.userInfo.email != "") {
+        var req = {
+            method: "GET",
+            action: "http://localhost:9000/register?usermail="+user.userInfo.email
+        }   
+        httpReqASync(req);
     }
-    httpReqASync(req);
 };
 
-setInterval(poll,1000); // poll once in a second
+var poll2 = function(){
+    var Babble = window.Babble;
+    var user;
+    Babble.getStats(function(resulti){
+        if(resulti !== undefined )
+        {
+            document.getElementById('cntUsers').innerHTML = resulti.users;
+            document.getElementById('cntMsg').innerHTML = resulti.messages;
+            poll2();
+            //setInterval(poll2, 30000); //every 30 second send a new request.
+        }
+    });
+};
 
 /*** Register Events ***/
 window.onload = function () {	
-    var user;
+    var user, local;
     var textArea = document.getElementById("textArea");
 	if (typeof(Storage) !== "undefined")
-	{
+	{     
 		if (localStorage.length == 0) //we don't have info yet
 		{ 
 			document.getElementById("modal").style.display = "block";
+            local = new INFO('', '');
+            localStorage.setItem('babble', JSON.stringify(local));
+
+            //checking
+            var print = JSON.parse(localStorage.getItem("babble"));
+            console.log(print);
+
 		}
 		else //we have user info in localStorage
 		{
@@ -166,7 +178,9 @@ window.onload = function () {
             {
                 textArea.value = user.currentMessage;
             }
-		}	
+		}
+        poll2();
+        poll();	
 	} 
 	else
 	{
@@ -185,11 +199,22 @@ document.getElementById('Save').onclick = function () {
         alert("Please insert correct Email Address!");
 		x.elements[1].value = "";
     }
-    else{
-	var user = new INFO(x.elements[0].value, x.elements[1].value);
-    document.getElementById('modal').style.display = "none";
-	
-	Babble.register(user);	
+    else
+    {
+	    var user = new INFO(x.elements[0].value, x.elements[1].value);
+        var user2 = new INFO2(x.elements[0].value, x.elements[1].value);	
+	    if (typeof(Storage) !== "undefined")
+        {
+            localStorage.setItem('babble', JSON.stringify(user));
+            var print = JSON.parse(localStorage.getItem("babble"));
+            console.log(print);
+	    }
+        else
+        {
+	        console.log('Not supported');
+	    }
+        document.getElementById('modal').style.display = "none";
+	    Babble.register(user2);
     }
 };
 
@@ -199,7 +224,9 @@ document.getElementById('Save').onclick = function () {
 	var user = new INFO('Anonymous', 'Anonymous');
 	
 	if (typeof(Storage) !== "undefined") {
-    localStorage.setItem('babble', JSON.stringify(user));
+        localStorage.setItem('babble', JSON.stringify(user));
+        var print = JSON.parse(localStorage.getItem("babble"));
+        console.log(print);
 
 	} else {
 	console.log('Not supported');
@@ -250,6 +277,13 @@ function INFO(_name, _email, currentMessage="")
 	this.currentMessage = currentMessage;
 }
 
+function INFO2(_name, _email) //for testing
+{
+	this.name = _name;
+	this.email = _email;
+}
+
+//type of message array
 function MessageDetails(_name, _email, _data, _time, _id, _image="") {
         this.name = _name;
         this.email = _email;
@@ -397,16 +431,15 @@ function updateBrowser(babble) {
 		boxMsg.appendChild(_time);
 	
 		// Close button
+        if(babble[i].email == user_email)
+        {
 		var _close = document.createElement("button");
 		_close.appendChild(document.createTextNode("x"));
 		_close.setAttribute('class', 'delete');
 		_close.setAttribute('aria-label', 'closeButton');
-		//_close.setAttribute('tabindex', messageCounter);
-		//_close.setAttribute('onclick','deleteMessage(babble, i);');
         _close.addEventListener("click", deleteMsg(babble, i));
-        //_close.addEventListener("click", deleteMsg(babble, i));
 		boxMsg.appendChild(_close);
-
+        }
 		// New message text
 		var newMsg = document.createElement("p");
 		var _text = document.createTextNode(babble[i].data);
@@ -445,3 +478,17 @@ if(localStorage.length == 1)
 		}
 	}
 }
+//Another polling request with empty response to keep the server alive.
+function Alive(){
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "http://localhost:9000/alive", true);
+    xhr.onload = function (){
+        if (xhr.status == 200 || xhr.status == 204)
+        {
+            console.log("The server is still ALIVE!");
+        }
+    };
+    xhr.send();
+}
+
+setInterval(Alive, 30000);
