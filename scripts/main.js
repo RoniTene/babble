@@ -1,8 +1,3 @@
-///// User java script /////
-//'use strict';
-//var a = new INFO('', '');
-//localStorage.setItem('babble', JSON.stringify(a));
-
 window.Babble = {
 	id: 42,
 	messagesArr : new Array(),
@@ -60,20 +55,6 @@ window.Babble = {
 	}
 };
 
-/*function httpReqSync(method, url, data)
-{
-    var xhr = new XMLHttpRequest();
-    xhr.open(method, url, false); // false for synchronous request
-    if (method === "POST")
-    {
-        xhr.send(JSON.stringify(data));
-    }
-    else
-        xhr.send();
-
-    return xhr.responseText;
-}*/
-
 function httpReqASync(req) {
     return new Promise(function(resolve, reject) {
         var xhr = new XMLHttpRequest();
@@ -127,7 +108,6 @@ var poll = function(){
             numOfMsg = result.length;
             updateBrowser(result);
             poll();
-            //setInterval(poll, 30000); //every 30 second send a new request.
         }
     });
 
@@ -149,7 +129,6 @@ var poll2 = function(){
             document.getElementById('cntUsers').innerHTML = resulti.users;
             document.getElementById('cntMsg').innerHTML = resulti.messages;
             poll2();
-            //setInterval(poll2, 30000); //every 30 second send a new request.
         }
     });
 };
@@ -163,24 +142,19 @@ window.onload = function () {
 		if (localStorage.length == 0) //we don't have info yet
 		{ 
 			document.getElementById("modal").style.display = "block";
-            local = new INFO('', '');
-            localStorage.setItem('babble', JSON.stringify(local));
-
-            //checking
-            var print = JSON.parse(localStorage.getItem("babble"));
-            console.log(print);
-
+            		local = new INFO('', '');
+            		localStorage.setItem('babble', JSON.stringify(local));
 		}
 		else //we have user info in localStorage
 		{
-            user = JSON.parse(localStorage.getItem('babble'));
-            if (user.currentMessage != "") //restore user's message
-            {
-                textArea.value = user.currentMessage;
-            }
+            		user = JSON.parse(localStorage.getItem('babble'));
+            		if (user.currentMessage != "") //restore user's message
+            		{
+                		textArea.value = user.currentMessage;
+            		}
 		}
-        poll2();
-        poll();	
+       	 	poll2();
+        	poll();	
 	} 
 	else
 	{
@@ -202,15 +176,15 @@ document.getElementById('Save').onclick = function () {
     else
     {
 	    var user = new INFO(x.elements[0].value, x.elements[1].value);
-        var user2 = new INFO2(x.elements[0].value, x.elements[1].value);	
+            var user2 = new INFO2(x.elements[0].value, x.elements[1].value);	
 	    if (typeof(Storage) !== "undefined")
-        {
-            localStorage.setItem('babble', JSON.stringify(user));
-            var print = JSON.parse(localStorage.getItem("babble"));
-            console.log(print);
+            {
+            	localStorage.setItem('babble', JSON.stringify(user));
+            	var print = JSON.parse(localStorage.getItem("babble"));
+            	console.log(print);
 	    }
-        else
-        {
+            else
+            {
 	        console.log('Not supported');
 	    }
         document.getElementById('modal').style.display = "none";
@@ -300,7 +274,6 @@ function checkTime(i) {
   return i;
 }
 
-
 /*** Rezise the textarea according to text (till 300px) ***/
 function resizeTextarea(ev) {
     ev.style.height = '90px';
@@ -347,24 +320,24 @@ document.getElementById("textArea").addEventListener("keyup", function(event) {
     event.preventDefault();
     if (event.keyCode == 13) {
             var userDetails;
-			var data = form.elements[0].value; //the message typed
-			if (typeof(Storage) !== "undefined") {
-				// Store
-				userDetails = localStorage.getItem('babble');
-				userDetails = JSON.parse(userDetails);  // get user info
-			} 
-			else {
-				console.log('Not supported');
-			}
-			var DATE = new Date();
-			var h = checkTime(DATE.getHours());
-			var m = checkTime(DATE.getMinutes());
-			var curTime = h + ":" + m;
+		var data = form.elements[0].value; //the message typed
+		if (typeof(Storage) !== "undefined") {
+			// Store
+			userDetails = localStorage.getItem('babble');
+			userDetails = JSON.parse(userDetails);  // get user info
+		} 
+	    	else {
+			console.log('Not supported');
+		}
+		var DATE = new Date();
+		var h = checkTime(DATE.getHours());
+		var m = checkTime(DATE.getMinutes());
+	    	var curTime = h + ":" + m;
 		
-			var msg = new MessageDetails(userDetails.userInfo.name, userDetails.userInfo.email, data, curTime, Babble.id, '');
-			Babble.postMessage(msg, function(){
-				document.getElementById("textArea").value='';
-			});
+		var msg = new MessageDetails(userDetails.userInfo.name, userDetails.userInfo.email, data, curTime, Babble.id, '');
+		Babble.postMessage(msg, function(){
+			document.getElementById("textArea").value='';
+		});
         window.location = "#newestMsg"; //show us always the last message
     }
 });
@@ -426,7 +399,7 @@ function updateBrowser(babble) {
 		var _time = document.createElement("time");
 		_time.appendChild(document.createTextNode(babble[i].time));
 		_time.setAttribute('class', 'hour');
-        var unixTime = Date.now();
+        	var unixTime = Date.now();
 		_time.setAttribute('datatime', unixTime);
 		boxMsg.appendChild(_time);
 	
@@ -452,7 +425,6 @@ function updateBrowser(babble) {
 		// Add new li to ol
 		ol.appendChild(li);
 	}
-
     window.location = "#newestMsg";
 }
 
@@ -492,4 +464,3 @@ function Alive(){
 }
 
 setInterval(Alive, 30000);
-
