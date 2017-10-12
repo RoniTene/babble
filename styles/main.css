@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css?family=Nunito');
 html{
     margin: 0;
     padding: 0;
@@ -336,3 +335,4 @@ textarea:focus{
 	background-color: #EBEDEC;
     border: 1px solid #D7D7D7;
 }
+@import url('https://fonts.googleapis.com/css?family=Nunito');
