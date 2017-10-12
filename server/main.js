@@ -2,6 +2,8 @@ var http = require('http');
 var urlUtil = require('url');
 var queryUtil = require('querystring');
 var messages = require('./messages-util.js');
+var clients = [];
+var statsReq = [];
 
 var Babble = messages.Babble;
 var message;
@@ -34,7 +36,17 @@ var server = http.createServer(function (request, response) {
 				idx = parseInt(msgId); // get message index
 				message = Babble.messagesArr[idx];
 				messages.deleteMessage(message.id);
-		
+                                Babble.userCount = Babble.usersArr.length;
+                                while (statsReq.length > 0){
+                                        var clienti = statsReq.pop();
+                                        clienti.writeHead(200, { "Content-Type": "application/json" });
+                                        clienti.end(JSON.stringify({ users: Babble.userCount, messages: Babble.messagesArr.length }));
+                                }
+                                while (clients.length > 0){
+                                        var client = clients.pop();
+                                        client.end(JSON.stringify(messages.getMessages(Babble.messagesArr.length + 1)));
+                                }
+
 				response.writeHead(200);
 				response.end(JSON.stringify(true));
 			}
@@ -58,8 +70,6 @@ var server = http.createServer(function (request, response) {
 		}
 		else if ((url.path) ==="/messages")
 		{
-			//TODO:
-			//somewhere here- bad data- response.writeHead(400);
 			var requestBody = '';
 			request.on('data', function (chunk) {
                         requestBody += chunk.toString();
@@ -81,6 +91,16 @@ var server = http.createServer(function (request, response) {
                                 if (data.name !== undefined) // add message
                                 {
                                         messages.addMessage(data);
+                                        Babble.userCount = Babble.usersArr.length;
+                                        while (clients.length > 0){
+                                                var client = clients.pop();
+                                                client.end(JSON.stringify(messages.getMessages(Babble.messagesArr.length + 1)));
+                                        }
+                                        while (statsReq.length > 0){
+                                                var clienti = statsReq.pop();
+                                                clienti.writeHead(200, { "Content-Type": "application/json" });
+                                                clienti.end(JSON.stringify({ users: Babble.userCount, messages: Babble.messagesArr.length }));
+                                }
                                 }
     
                                 response.writeHead(200);
@@ -102,10 +122,15 @@ var server = http.createServer(function (request, response) {
                 if (!Babble.usersArr.includes(email)) //can be only one user with this email
                 {
                     (Babble.usersArr).splice(Babble.usersArr.legth, 0, email);
-                    //(Babble.usersArr).push(name);
                     Babble.userCount = (Babble.usersArr).length; // userCount++
                     console.log("Number of users: " + Babble.userCount);
-                    response.writeHead(200);
+                    while (statsReq.length > 0){
+                        var client = statsReq.pop();
+                        client.writeHead(200, { "Content-Type": "application/json" });
+                        client.end(JSON.stringify({ users: Babble.userCount, messages: Babble.messagesArr.length }));
+                    }
+                    response.writeHead(200, { "Content-Type": "application/json" });
+		    response.end();
                 }
             }
 
@@ -117,21 +142,32 @@ var server = http.createServer(function (request, response) {
                 {
                     (Babble.usersArr).splice(Babble.usersArr.indexOf(email), 1);
                     Babble.userCount = (Babble.usersArr).length; // userCount--
-                    response.writeHead(200);
+                    while (statsReq.length > 0){
+                        var client = statsReq.pop();
+                        client.writeHead(200, { "Content-Type": "application/json" });
+                        client.end(JSON.stringify({ users: Babble.userCount, messages: Babble.messagesArr.length }));
+                    }
+                    response.writeHead(200, { "Content-Type": "application/json" });
+		    response.end();
                 }
             }
 
 	    else if ((url.path) ==="/stats")
             {
-                response.writeHead(200, { "Content-Type": "application/json" });
-		response.end(JSON.stringify({ users: Babble.userCount, messages: Babble.messagesArr.length }));
+                /*response.writeHead(200, { "Content-Type": "application/json" });
+		response.end(JSON.stringify({ users: Babble.userCount, messages: Babble.messagesArr.length }));*/
+                statsReq.push(response);
+	    }
+
+           else if ((url.path) ==="/alive")
+            {
+                response.writeHead(200);
+		response.end();
 	    }
             
 	    else if ((url.path).includes("/messages?counter="))
 	    {
                 count = parseInt((url.path).substring((url.path).indexOf('=') + 1, (url.path).length));
-                console.log("the messageArr size is:" + (Babble.messagesArr).length);
-                console.log("the count parameter is:" + count);
                 if (!isNaN(count))
                 {
                       if (count != (Babble.messagesArr).length)
@@ -139,9 +175,10 @@ var server = http.createServer(function (request, response) {
 		        response.writeHead(200, { "Content-Type": "application/json" });
 	                response.end(JSON.stringify(messages.getMessages(Babble.messagesArr.length + 1)));
                       }
-                      else
+                      else //no new messages
                       {
-                              response.end();
+                              clients.push(response);
+                              //response.end();
                       }
                 }
                 else
@@ -150,9 +187,14 @@ var server = http.createServer(function (request, response) {
 		        response.end();
                 }
              }
-	     else
+	     else if((url.path) ==="/messages" || (url.path) ==="/messages/")
 	     {
 		    response.writeHead(405);
+		    response.end();
+	     }
+             else
+	     {
+		    response.writeHead(404);
 		    response.end();
 	     }
 		
@@ -361,6 +403,6 @@ var MD5 = function (string) {
 
 
 server.listen(9000);
-setInterval(function () { Babble.usersArr = []; Babble.userCount = 0; }, 30000); // clear to refresh data
+//setInterval(function () { Babble.usersArr = []; Babble.userCount = 0; }, 30000); // clear to refresh data
 console.log("listening...");
 
