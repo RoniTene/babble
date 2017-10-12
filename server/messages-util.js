@@ -32,4 +32,3 @@ var deleteMessage = function(id)
 }
 
 module.exports = {Babble,addMessage, getMessages, deleteMessage};
-
